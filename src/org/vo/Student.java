@@ -1,20 +1,27 @@
 package org.vo;
 
-public class Student {
-	public static final int CLASSES = 10;
+public class Student implements Comparable<Student>, Cloneable {
+	public static final int CLASSES = 10; 
 	
 	private int id;
 	private String name;
 	private double[] results;
-	private double totalScore;
+	private double totalS;
 	private double avrg;
+
 	
 	public Student() {
 		results = new double[CLASSES];
 		for(int i = 0; i < results.length; i++) {
-			results[i] = -2;
+			results[i] = -3;
 		}
 	}
+	
+	public Student(String name) {
+		this();
+		this.name=name;	
+	}
+
 	
 	public Student(int id, String name) {
 		this();
@@ -45,20 +52,27 @@ public class Student {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		String str = "";
+		calcScore();
+		String str = name+"\t";
 		for(int i = 0; i < results.length; i++) {
 			if(results[i]==-1) {
 				str += "수강X\t";
 			} else if(results[i]==-2) {
-				continue;
-			} else str += results[i]+"\t";
+				str += "입력X\t";
+			} else if(results[i]==-3) {
+			} else {str += results[i]+"\t";
+			}
 		}
-		return name+"\t"+str;
+		str += totalS+"\t";
+		str += String.format("%.2f", avrg);
+		return str;
 	}
 
-	public Student copyStudent(Student a) {
+	public Student copyStudent(Student a) throws CloneNotSupportedException {
 		Student copy = new Student(a.getId(), a.getName());
 		copy.setResults(a.getResults());
+		copy.setAvrg(a.getAvrg());
+		copy.setTotalS(a.getTotalS());
 		return copy;
 	}
 
@@ -71,25 +85,64 @@ public class Student {
 	}
 	
 	public void setScore(int i, double d) {
-		results[i] = d;
+		if(i<results.length-2) results[i] = d;
 	}
 	
 	public double getScore(int i) {
 		return results[i];
 	}
 	
-	public void calcScore() {
-		int cnt = 0;
-		for(int i = 0; i<results.length; i++) {
-			if(results[i]!=-1&&results[i]!=-2) {
-				totalScore += results[i];
-				cnt++;
-			}
-		}
-		setAvrg(totalScore/cnt);
+	
+	
+	public void setTotalS(double totalS) {
+		this.totalS = totalS;
 	}
 
 	public void setAvrg(double avrg) {
 		this.avrg = avrg;
+	}
+
+	public double getTotalS() {
+		calcScore();
+		return totalS;
+	}
+
+	public double getAvrg() {
+		calcScore();
+		return avrg;
+	}
+
+	public void calcScore() {
+		int cnt = 0;
+		totalS = 0;
+		for(int i = 0; i<results.length; i++) {
+			if(results[i]!=-1&&results[i]!=-2&&results[i]!=-3) {
+				totalS += results[i];
+				cnt++;
+			}
+		}
+		avrg = totalS/cnt;
+	}
+	
+	public String prtScore(int i) {
+		calcScore();
+		if(results[i]==-1) {
+		return "수강X";
+		} else if(results[i]==-2) {
+			return "입력X";
+		} else return String.format("%.2f", results[i]);
+	}
+
+	public int compareTo(Student other) {
+		// TODO Auto-generated method stub
+		calcScore();
+		if(this.avrg<other.avrg) {
+			return -1;
+		} else if(this.avrg==other.avrg) {
+			return 0;
+		} else {
+			return 1;
+		}
+			
 	}
 }
